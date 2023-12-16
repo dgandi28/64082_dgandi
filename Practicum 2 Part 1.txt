@@ -1,0 +1,354 @@
+CREATE TABLE AIS_Member(
+    Member_ID INTEGER,
+    MemberType TEXT,
+    Code_Of_Ethics_Agreement TEXT DEFAULT 'Y' NOT NULL,
+    Member_Email TEXT UNIQUE NOT NULL,
+    Name TEXT NOT NULL,
+	Phone TEXT UNIQUE NOT NULL,
+    CONSTRAINT PK_AIS_Member PRIMARY KEY (Member_ID),
+    CONSTRAINT MEMBER_TYPE_CHK CHECK (MemberType IN ('Student', 'Academic', 'Professional')),
+    CONSTRAINT EMPLOYEE_ETHICS_CHK CHECK (Code_Of_Ethics_Agreement IN ('Y', 'N')),
+	CONSTRAINT MEMBER_EMP_EMAIL_CHK CHECK (Member_Email LIKE '%_@%_.%_')
+);
+
+CREATE TABLE AIS_Member_Student(
+Member_ID INTEGER,
+Dissertion_Title TEXT,
+CONSTRAINT PK_AIS_Member_Student PRIMARY KEY (Member_ID),
+CONSTRAINT FK_AIS_Member_Student FOREIGN KEY (Member_ID) REFERENCES AIS_Member(Member_ID)
+);
+
+ALTER TABLE AIS_Member_Student ADD COLUMN School TEXT;
+
+
+CREATE TABLE AIS_Member_Academic(
+Member_ID INTEGER,
+Rank TEXT,
+CONSTRAINT PK_AIS_Member_Academic PRIMARY KEY (Member_ID),
+CONSTRAINT FK_AIS_Member_Academic FOREIGN KEY (Member_ID) REFERENCES AIS_Member(Member_ID)
+);
+
+ALTER TABLE AIS_Member_Academic ADD COLUMN School TEXT;
+
+
+CREATE TABLE AIS_Member_Professional(
+Member_ID INTEGER,
+AIS_Member_Professional_Title TEXT,
+CONSTRAINT PK_AIS_Member_Professional PRIMARY KEY (Member_ID),
+CONSTRAINT FK_AIS_Member_Professional FOREIGN KEY (Member_ID) REFERENCES AIS_Member(Member_ID)
+);
+
+ALTER TABLE AIS_Member_Professional ADD COLUMN Organization TEXT;
+
+
+CREATE TABLE Conference (
+    Conference_ID INTEGER,
+    Category TEXT DEFAULT 'DOMESTIC' NOT NULL,
+    Location TEXT,
+    Name TEXT NOT NULL,
+    CONSTRAINT PK_Conference PRIMARY KEY (Conference_ID),
+    CONSTRAINT CONFERENCE_CATEGORY_CH CHECK (Category IN ('INTERNATIONAL', 'DOMESTIC', 'COMBINED'))
+);
+
+
+ALTER TABLE Conference ADD COLUMN Date DATE NOT NULL;
+
+
+CREATE TABLE Conference_Registration(
+Conference_Registration_ID INTEGER,
+Member_ID INTEGER,
+Conference_ID INTEGER,
+CONSTRAINT PK_Conference_Registration PRIMARY KEY (Conference_Registration_ID),
+CONSTRAINT FK_Conference_Registration_Member_ID FOREIGN KEY (Member_ID) REFERENCES AIS_Member(Member_ID),
+CONSTRAINT FK_Conference_Registration_ID FOREIGN KEY (Conference_ID) REFERENCES Conference(Conference_ID)
+);
+
+ALTER TABLE Conference_Registration ADD COLUMN Date DATE;
+
+
+CREATE TABLE Membership_Renewal (
+    Renewal_ID INTEGER,
+    Member_ID INTEGER,
+    Date DATE NOT NULL DEFAULT (CURRENT_DATE),
+    Price INTEGER NOT NULL,
+    CONSTRAINT PK_Membership_Renewal PRIMARY KEY (Renewal_ID),
+    CONSTRAINT FK_Membership_Renewal FOREIGN KEY (Member_ID) REFERENCES AIS_Member(Member_ID),
+    CONSTRAINT RENEWAL_DATE_LOWER_LIMIT_CHK CHECK (Date >= '2000-01-01'),
+    CONSTRAINT RENEWAL_PRICE_LOWER_LIMIT_CHK CHECK (Price >= 100),
+    CONSTRAINT RENEWAL_PRICE_UPPER_LIMIT_CHK CHECK (Price <= 1000)
+);
+
+
+CREATE TABLE SIG_Membership(
+SIG_Membership_ID INTEGER,
+Renewal_ID INTEGER,
+Name TEXT,
+SIG_code TEXT UNIQUE,
+CONSTRAINT SIG_CODE_CH CHECK (SIG_Code LIKE 'SIG%____'),
+CONSTRAINT PK_SIG_Membership PRIMARY KEY (SIG_Membership_ID),
+CONSTRAINT FK_SIG_Membership FOREIGN KEY (Renewal_ID) REFERENCES Membership_Renewal(Renewal_ID)
+);
+
+/*Insert commands for AIS_Member Table*/
+
+
+INSERT INTO AIS_Member (Member_ID, MemberType, Code_Of_Ethics_Agreement, Member_Email, Name, Phone)
+VALUES (911301, 'Student', 'Y', 'bumrah@gmail.com', 'Bumrah', '1234567890');
+
+INSERT INTO AIS_Member (Member_ID, MemberType, Code_Of_Ethics_Agreement, Member_Email, Name, Phone)
+VALUES (911302, 'Academic', 'N', 'rohit@kent.edu', 'Rohit Sharma', '9876543210');
+
+INSERT INTO AIS_Member (Member_ID, MemberType, Code_Of_Ethics_Agreement, Member_Email, Name, Phone)
+VALUES (911303, 'Professional', 'Y', 'johnson@tcs.com', 'Johnson', '5522557689');
+
+INSERT INTO AIS_Member (Member_ID, MemberType, Code_Of_Ethics_Agreement, Member_Email, Name, Phone)
+VALUES (911304, 'Student', 'Y', 'randys@yahoo.com', 'Randy Salem', '1234567891');
+
+INSERT INTO AIS_Member (Member_ID, MemberType, Code_Of_Ethics_Agreement, Member_Email, Name, Phone)
+VALUES (911305, 'Professional', 'N', 'mohites@tcs.com', 'Mohit Eswar', '8668811117');
+
+INSERT INTO AIS_Member (Member_ID, MemberType, Code_Of_Ethics_Agreement, Member_Email, Name, Phone)
+VALUES (911306, 'Academic', 'Y', 'susanth@sds.edu', 'Susnth Singh', '7700766881');
+
+INSERT INTO AIS_Member (Member_ID, MemberType, Code_Of_Ethics_Agreement, Member_Email, Name, Phone)
+VALUES (911307, 'Student', 'Y', 'robert@gmail.com', 'Robert Davis', '7854321144');
+
+INSERT INTO AIS_Member (Member_ID, MemberType, Code_Of_Ethics_Agreement, Member_Email, Name, Phone)
+VALUES (911308, 'Professional', 'N', 'linda@tcs.com', 'Linda Wilson', '4352345609');
+
+INSERT INTO AIS_Member (Member_ID, MemberType, Code_Of_Ethics_Agreement, Member_Email, Name, Phone)
+VALUES (911309, 'Academic', 'Y', 'sanon@texas.edu', 'Sanon', '4567892134');
+
+INSERT INTO AIS_Member (Member_ID, MemberType, Code_Of_Ethics_Agreement, Member_Email, Name, Phone)
+VALUES (911310, 'Student', 'Y', 'sarah@yahoo.com', 'Sarah Varma', '33005454673');
+
+
+
+/*Insert for AIS Member Student table*/
+
+INSERT INTO AIS_Member_Student (Member_ID, Dissertion_Title, School) values
+(911301, 'Supersonic Research', 'Gitam Public School');
+
+INSERT INTO AIS_Member_Student (Member_ID, Dissertion_Title, School) values
+(911304, 'Neurolink', 'Anits Public School');
+
+INSERT INTO AIS_Member_Student (Member_ID, Dissertion_Title, School) values
+(911307, 'AI ChatBot', 'Pen Public School');
+
+INSERT INTO AIS_Member_Student (Member_ID, Dissertion_Title, School) values
+(911310, 'Problem of Fragmentation', 'Radison Public School');
+
+
+/* Insert for AIS Member Academic table*/
+
+INSERT INTO AIS_Member_Academic (Member_ID, Rank, School) values
+(911302, '10', 'Ravenna Public School');
+
+INSERT INTO AIS_Member_Academic (Member_ID, Rank, School) values
+(911306, '12', 'Rajol Public School');
+
+INSERT INTO AIS_Member_Academic (Member_ID, Rank, School) values
+(911309, '1', 'Maharaja Public School');
+
+
+
+/* Insert for  AIS Member Professional table*/
+
+INSERT INTO AIS_Member_Professional (Member_ID, AIS_Member_Professional_Title, Organization) VALUES 
+(911303, 'Teacher','Kent Public School');
+
+INSERT INTO AIS_Member_Professional (Member_ID, AIS_Member_Professional_Title, Organization) VALUES 
+(911305, 'Principal','Ravenna Public School');
+	
+INSERT INTO AIS_Member_Professional (Member_ID, AIS_Member_Professional_Title, Organization) VALUES 
+(911308, 'Associate','Tata Consultancy');
+
+
+
+/*Insert  for membership Renewal*/
+
+
+INSERT INTO Membership_Renewal (Renewal_ID, Member_ID, Date, Price)
+VALUES (958381, 911301,'2000-07-01', 250);
+
+INSERT INTO Membership_Renewal (Renewal_ID, Member_ID, Date, Price)
+VALUES (958382, 911302,'2003-02-12', 978);
+
+INSERT INTO Membership_Renewal (Renewal_ID, Member_ID, Date, Price)
+VALUES (958383, 911303,'2002-04-17', 511);
+
+INSERT INTO Membership_Renewal (Renewal_ID, Member_ID, Price)
+VALUES (958384, 911304, 289);
+
+INSERT INTO Membership_Renewal (Renewal_ID, Member_ID, Date, Price)
+VALUES (958385, 911305,'2013-06-21', 467);
+
+INSERT INTO Membership_Renewal (Renewal_ID, Member_ID, Date, Price)
+VALUES (958386, 911306,'2014-03-11', 349);
+
+INSERT INTO Membership_Renewal (Renewal_ID, Member_ID, Date, Price)
+VALUES (958387, 911307,'2002-08-18', 450);
+
+INSERT INTO Membership_Renewal (Renewal_ID, Member_ID, Date, Price)
+VALUES (958388, 911308,'2005-09-09', 567);
+
+INSERT INTO Membership_Renewal (Renewal_ID, Member_ID, Date, Price)
+VALUES (958389, 911309,'2007-03-22', 325);
+
+INSERT INTO Membership_Renewal (Renewal_ID, Member_ID,Date, Price)
+VALUES (958390,911310,'2009-11-27', 781);
+
+/* Insert for SIG Membership table*/
+
+INSERT INTO SIG_Membership (SIG_Membership_ID, Renewal_ID, Name, SIG_Code)
+VALUES (15981, 958381, 'Unlimited', 'SIGisua82r');
+
+INSERT INTO SIG_Membership (SIG_Membership_ID, Renewal_ID, Name, SIG_Code)
+VALUES (15982, 958382, 'Plus', 'SIG6jah89');
+
+INSERT INTO SIG_Membership (SIG_Membership_ID, Renewal_ID, Name, SIG_Code)
+VALUES (15992, 958382, 'Plus', 'SIG82jab6');
+
+INSERT INTO SIG_Membership (SIG_Membership_ID, Renewal_ID, Name, SIG_Code)
+VALUES (15983, 958383, 'Unlimited', 'SIG583au7');
+
+INSERT INTO SIG_Membership (SIG_Membership_ID, Renewal_ID, Name, SIG_Code)
+VALUES (15984, 958384, 'Unlimited', 'SIG38705');
+
+INSERT INTO SIG_Membership (SIG_Membership_ID, Renewal_ID, Name, SIG_Code)
+VALUES (15985, 958385, 'Plus', 'SIG158ban');
+
+INSERT INTO SIG_Membership (SIG_Membership_ID, Renewal_ID, Name, SIG_Code)
+VALUES (15986, 958386, 'Unlimited', 'SIG8kan7a');
+
+INSERT INTO SIG_Membership (SIG_Membership_ID, Renewal_ID, Name, SIG_Code)
+VALUES (15987, 958387, 'Plus', 'SIGjahsya');
+
+INSERT INTO SIG_Membership (SIG_Membership_ID, Renewal_ID, Name, SIG_Code)
+VALUES (15988, 958388, 'Unlimited', 'SIGnais6ga');
+
+INSERT INTO SIG_Membership (SIG_Membership_ID, Renewal_ID, Name, SIG_Code)
+VALUES (15989, 958389, 'Premium ', 'SIG22u87');
+
+INSERT INTO SIG_Membership (SIG_Membership_ID, Renewal_ID, Name, SIG_Code)
+VALUES (15990, 958390, 'Unlimited', 'SIG1oa340');
+
+INSERT INTO SIG_Membership (SIG_Membership_ID, Renewal_ID, Name, SIG_Code)
+VALUES (15991, 958388, 'Plus', 'SIG5666hba2');
+
+/* Insert for Conference table*/
+
+INSERT INTO Conference (Conference_ID, Category, Location, Name, Date)
+VALUES (2121, 'INTERNATIONAL', 'India', 'Techical Conference 2022', '2022-01-14');
+
+INSERT INTO Conference (Conference_ID, Category, Location, Name, Date)
+VALUES (2122, 'DOMESTIC', 'New York', ' Maritime Summit 2021', '2022-12-12');
+
+INSERT INTO Conference (Conference_ID, Category, Location, Name, Date)
+VALUES (2123, 'INTERNATIONAL', 'Tokyo', 'Science and Technology 2023', '2023-02-25');
+
+INSERT INTO Conference (Conference_ID, Category, Location, Name, Date)
+VALUES (2124, 'DOMESTIC', 'Australia', 'Tourism 2020', '2020-08-10');
+
+INSERT INTO Conference (Conference_ID, Category, Location, Name, Date)
+VALUES (2125, 'COMBINED', 'Japan', 'Military 2019', '2019-09-16');
+
+INSERT INTO Conference (Conference_ID, Category, Location, Name, Date)
+VALUES (2126, 'INTERNATIONAL', 'Sydney', 'Global Crisis Summit 2009', '2022-10-08');
+
+INSERT INTO Conference (Conference_ID, Location, Name, Date)
+VALUES (2127, 'Germany', 'Innovation Summit 2023', '2023-05-24');
+
+INSERT INTO Conference (Conference_ID, Category, Location, Name, Date)
+VALUES (2128, 'INTERNATIONAL', 'Dubai', 'AI Expo 2008', '2008-06-04');
+
+INSERT INTO Conference (Conference_ID, Category, Location, Name, Date)
+VALUES (2129, 'COMBINED', 'Chicago', 'Business and Economic 2006', '2006-04-12');
+
+INSERT INTO Conference (Conference_ID, Category, Location, Name, Date)
+VALUES (2130, 'DOMESTIC', 'Paris', 'Art and Culture 2025', '2025-09-29');
+
+/* Insert for Conference Registration table*/
+
+INSERT INTO Conference_Registration (Conference_Registration_ID, Member_ID, Conference_ID, Date)
+VALUES (5671, 911301, 2121, '2021-10-20');
+
+INSERT INTO Conference_Registration (Conference_Registration_ID, Member_ID, Conference_ID, Date)
+VALUES (5682, 911301, 2124, '2020-02-15');
+
+INSERT INTO Conference_Registration (Conference_Registration_ID, Member_ID, Conference_ID, Date)
+VALUES (5672, 911302, 2122, '2022-09-12');
+
+INSERT INTO Conference_Registration (Conference_Registration_ID, Member_ID, Conference_ID, Date)
+VALUES (5673, 911303, 2123, '2022-11-15');
+
+INSERT INTO Conference_Registration (Conference_Registration_ID, Member_ID, Conference_ID, Date)
+VALUES (5674, 911304, 2124, '2019-11-21');
+
+INSERT INTO Conference_Registration (Conference_Registration_ID, Member_ID, Conference_ID, Date)
+VALUES (5675, 911305, 2125, '2019-02-16');
+
+INSERT INTO Conference_Registration (Conference_Registration_ID, Member_ID, Conference_ID, Date)
+VALUES (5676, 911306, 2126, '2023-03-07');
+
+INSERT INTO Conference_Registration (Conference_Registration_ID, Member_ID, Conference_ID, Date)
+VALUES (5677, 911307, 2127, '2023-01-01');
+
+INSERT INTO Conference_Registration (Conference_Registration_ID, Member_ID, Conference_ID, Date)
+VALUES (5678, 911308, 2128, '2008-01-14');
+
+INSERT INTO Conference_Registration (Conference_Registration_ID, Member_ID, Conference_ID, Date)
+VALUES (5679, 911309, 2129, '2005-12-10');
+
+INSERT INTO Conference_Registration (Conference_Registration_ID, Member_ID, Conference_ID, Date)
+VALUES (5680, 911310, 2130, '2025-01-09');
+
+INSERT INTO Conference_Registration (Conference_Registration_ID, Member_ID, Conference_ID, Date)
+VALUES (5681, 911310, 2123, '2022-05-12');
+
+/*Select commands */
+ 
+select * from AIS_Member;
+
+select * from AIS_Member_Student;
+
+select * from AIS_Member_Academic;
+
+select * from AIS_Member_Professional;
+
+select * from Membership_Renewal;
+
+select * from SIG_Membership;
+
+select * from Conference;
+
+select * from Conference_Registration;
+
+/*Commands to Drop tables*/
+
+drop table  AIS_Member_Academic;
+
+drop table  AIS_Member_Professional;
+
+drop table  AIS_Member_Student;
+
+drop table  Conference_Registration;
+
+drop table  SIG_Membership;
+
+drop table  Conference;
+
+drop table   Membership_Renewal;
+
+drop table   AIS_Member;
+
+
+
+
+
+
+
+
+
+
+
